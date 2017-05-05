@@ -2,7 +2,7 @@ const annyang = require('annyang');
 
 // Default URL for fetching speech labels
 // Note that this can be changed by the user, therefore we use 'let' instead of 'const'
-let labelURL = 'annyang/label';
+let labelURL = '/speech-tree/label';
 let labelMatchingEnabled = false;
 
 // Fetches the belonging speech label for the provided sentence
