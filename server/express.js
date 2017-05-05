@@ -61,7 +61,7 @@ function matchLabel(options) {
       res.send(JSON.stringify({ label }));
     }
     catch (err) {
-      res.send(JSON.stringify({ label: 'notTrained' }));
+      res.send(JSON.stringify({ label: '__NO_MATCH__' }));
     }
   });
 };

@@ -50,7 +50,7 @@ function register(server, options, next) {
           reply({ label });
         }
         catch (err) {
-          reply({ label: 'notTrained' });
+          reply({ label: '__NO_MATCH__' });
         }
       }
     });
