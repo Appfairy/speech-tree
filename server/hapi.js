@@ -35,7 +35,7 @@ function register(server, options, next) {
     // After classifier has been trained, register route
     server.route({
       method: ['GET'],
-      path: `${options.path}`,
+      path: options.path,
       handler(request, reply) {
         const sentence = request.query.sentence;
 
