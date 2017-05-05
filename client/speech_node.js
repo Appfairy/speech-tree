@@ -22,7 +22,7 @@ class SpeechNode {
     this.commandNamesBatch.push(commandName);
 
     return {
-      or: this.on.bind(this),
+      on: this.on.bind(this),
       invoke: this.invoke.bind(this)
     };
   }
