@@ -1,7 +1,7 @@
 import boom from 'boom';
+import natural from 'natural';
 import pack from '../../package.json';
-import { LABEL_NOT_FOUND } from '../consts';
-import createSpeechClassifier from './speech_classifier';
+import { LABEL_DEFAULT_ENDPOINT, LABEL_NOT_FOUND } from '../consts';
 
 register.attributes = {
   name: pack.name,
@@ -10,54 +10,74 @@ register.attributes = {
 
 // Options:
 // - path (String): The path of the registered route
-// - trainer (Function): Required. A function which accepts the classifier in-order
-//   to train it.
-// - cacheFile (String): The path for the classifier's cache file.
-// - forceTraining (Boolean): Force the training process even though a cache file is
-//   available.
-function register(server, options, next) {
+// - getClassifier (Function): Required. A user-defined method which should return
+//   an instance of natural.BayesClassifier
+async function register(server, options, next) {
   // Apply defaults to options
   options = Object.assign({
-    path: '/speech-tree/label'
+    path: LABEL_DEFAULT_ENDPOINT
   }, options);
 
-  if (!options.trainer) {
-    throw TypeError('a trainer function must be specified');
+  if (typeof options.path != 'string') {
+    return next(TypeError('path must be a string'));
   }
 
-  const classifier = createSpeechClassifier(options);
+  if (!options.getClassifier) {
+    return next(TypeError('classifier getter must be specified'));
+  }
 
-  // Train classifier
-  options.trainer(classifier).then(() => {
-    if (!classifier._trained) {
-      throw Error('classifier must be trained');
-    }
+  if (typeof options.getClassifier != 'function') {
+    return next(TypeError('classifier getter must be a function'));
+  }
 
-    // After classifier has been trained, register route
-    server.route({
-      method: ['GET'],
-      path: options.path,
-      handler(request, reply) {
-        const sentence = request.query.sentence;
+  const getClassifierResult = options.getClassifier();
+  let classifierPromise = getClassifierResult;
 
-        if (!sentence) {
-          const error = boom.badRequest('sentence must be provided');
-          return reply(error);
-        }
+  if (typeof getClassifierResult.then != 'function' ||
+      typeof getClassifierResult.catch != 'function') {
+    classifierPromise = Promise.resolve(classifierPromise);
+  }
 
-        // Classifier might not be trained for some sentences
-        try {
-          const label = classifier.classify(sentence);
-          reply({ label });
-        }
-        catch (err) {
-          reply({ label: LABEL_NOT_FOUND });
-        }
+  let classifier;
+
+  try {
+    classifier = await classifierPromise();
+  }
+  catch (err) {
+    return next(err);
+  }
+
+  if (!(classifier instanceof natural.BayesClassifier)) {
+    return next(TypeError([
+      'classifier getter must return either an instance of natural.BayesClassifier or',
+      'an instance of Promise which returns an instance of natural.BayesClassifier'
+    ].join()));
+  }
+
+  // After classifier has been trained, register route
+  server.route({
+    method: ['GET'],
+    path: options.path,
+    handler(request, reply) {
+      const sentence = request.query.sentence;
+
+      if (!sentence) {
+        const error = boom.badRequest('sentence must be provided');
+        return reply(error);
       }
-    });
 
-    next();
+      // Classifier might not be trained for some sentences
+      try {
+        const label = classifier.classify(sentence);
+        reply({ label });
+      }
+      catch (err) {
+        reply({ label: LABEL_NOT_FOUND });
+      }
+    }
   });
+
+  next();
 }
 
 export default register;
