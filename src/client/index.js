@@ -7,6 +7,7 @@ const rootSpeechNode = new SpeechNode();
 // Export annyang methods
 Object.keys(annyang)
   .filter((k) => typeof annyang[k] == 'function')
+  .filter((k) => rootSpeechNode[k] == null)
   .forEach((k) => rootSpeechNode[k] = annyang[k].bind(annyang));
 
 // Export label matcher methods
