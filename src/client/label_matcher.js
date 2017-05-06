@@ -1,8 +1,9 @@
 import annyang from 'annyang';
+import { LABEL_DEFAULT_ENDPOINT, LABEL_NOT_FOUND } from'../consts';
 
 // Default URL for fetching speech labels
 // Note that this can be changed by the user, therefore we use 'let' instead of 'const'
-let labelURL = '/speech-tree/label';
+let labelURL = LABEL_DEFAULT_ENDPOINT;
 let labelMatchingEnabled = false;
 
 // Fetches the belonging speech label for the provided sentence
@@ -22,7 +23,7 @@ annyang.addCallback('resultNoMatch', [sentence], () => {
 
   getSentenceLabel(sentence).then((label) => {
     // Abort in case no match was found
-    if (label != '__NO_MATCH__') {
+    if (label != LABEL_NOT_FOUND) {
       // Annotate labels with hash-tag
       annyang.trigger('#' + label);
     }

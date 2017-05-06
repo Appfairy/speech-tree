@@ -1,5 +1,6 @@
 import boom from 'boom';
 import pack from '../../package.json';
+import { LABEL_NOT_FOUND } from '../consts';
 import createSpeechClassifier from './speech_classifier';
 
 register.attributes = {
@@ -50,7 +51,7 @@ function register(server, options, next) {
           reply({ label });
         }
         catch (err) {
-          reply({ label: '__NO_MATCH__' });
+          reply({ label: LABEL_NOT_FOUND });
         }
       }
     });

@@ -1,4 +1,5 @@
 import express from 'express';
+import { LABEL_NOT_FOUND } from '../consts';
 import createSpeechClassifier from './speech_classifier';
 
 let classifier;
@@ -61,7 +62,7 @@ export function matchLabel(options) {
       res.send(JSON.stringify({ label }));
     }
     catch (err) {
-      res.send(JSON.stringify({ label: '__NO_MATCH__' }));
+      res.send(JSON.stringify({ label: LABEL_NOT_FOUND }));
     }
   });
 }
