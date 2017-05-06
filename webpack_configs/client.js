@@ -1,6 +1,7 @@
 var path = require('path');
 var UnminifiedWebpackPlugin = require('unminified-webpack-plugin');
 var webpack = require('webpack');
+var nodeExternals = require('webpack-node-externals');
 
 module.exports = {
   entry: [
@@ -31,5 +32,6 @@ module.exports = {
       sourceMap: true
     }),
     new UnminifiedWebpackPlugin()
-  ]
+  ],
+  externals: [nodeExternals()]
 };
