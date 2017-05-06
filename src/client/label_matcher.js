@@ -1,4 +1,4 @@
-const annyang = require('annyang');
+import annyang from 'annyang';
 
 // Default URL for fetching speech labels
 // Note that this can be changed by the user, therefore we use 'let' instead of 'const'
@@ -29,9 +29,7 @@ annyang.addCallback('resultNoMatch', [sentence], () => {
   });
 });
 
-module.exports = {
-  getLabelURL: () => labelURL,
-  setLabelURL: (value) => labelURL = value,
-  enableLabelMatching: () => labelMatchingEnabled = true,
-  disableLabelMatching: () => labelMatchingEnabled = false
-};
+export const getLabelURL = () => labelURL;
+export const setLabelURL = (value) => labelURL = value;
+export const enableLabelMatching = () => labelMatchingEnabled = true;
+export const disableLabelMatching = () => labelMatchingEnabled = false;

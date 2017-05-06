@@ -1,4 +1,4 @@
-const annyang = require('annyang');
+import annyang from 'annyang';
 
 class SpeechNode {
   constructor() {
@@ -63,4 +63,4 @@ class SpeechNode {
   }
 }
 
-module.exports = rootSpeechNode;
+export default rootSpeechNode;

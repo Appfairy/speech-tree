@@ -1,10 +1,10 @@
-const fs = require('fs');
-const natural = require('natural');
-const path = require('path');
+import fs from 'fs';
+import natural from 'natural';
+import path from 'path';
 
 function createSpeechClassifier(options) {
   // Resolve relative cache file path to cwd
-  const cacheFile = options.cacheFile && path.resolve(process.cwd(), options.cacheFile);
+  let cacheFile = options.cacheFile && path.resolve(process.cwd(), options.cacheFile);
 
   // Check if cache file exists
   try {
@@ -53,4 +53,4 @@ function createSpeechClassifier(options) {
   }
 }
 
-module.exports = createSpeechClassifier;
+export default createSpeechClassifier;

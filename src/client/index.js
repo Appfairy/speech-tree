@@ -1,5 +1,5 @@
-const labelMatcher = require('./label_matcher');
-const SpeechNode = require('./speech_node');
+import labelMatcher from './label_matcher';
+import SpeechNode from './speech_node';
 
 const rootSpeechNode = new SpeechNode();
 
@@ -15,4 +15,4 @@ Object.defineProperty(rootSpeechNode, 'labelURL', {
   set: labelMatcher.setLabelURL.bind(labelMatcher)
 });
 
-module.exports = rootSpeechNode;
+export default rootSpeechNode;

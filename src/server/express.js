@@ -1,5 +1,5 @@
-const express = require('express');
-const createSpeechClassifier = require('./speech_classifier');
+import express from 'express';
+import createSpeechClassifier from './speech_classifier';
 
 let classifier;
 
@@ -9,7 +9,7 @@ let classifier;
 // - cacheFile (String): The path for the classifier's cache file.
 // - forceTraining (Boolean): Force the training process even though a cache file is
 //   available.
-function trainClassifier(options) {
+export function trainClassifier(options) {
   if (!options.trainer) {
     throw TypeError('a trainer function must be specified');
   }
@@ -32,7 +32,7 @@ function trainClassifier(options) {
 
 // Options:
 // - url (String): The url of the registered route
-function matchLabel(options) {
+export function matchLabel(options) {
   // Apply defaults to options
   options = Object.assign({
     url: '/speech-tree/label'
@@ -64,9 +64,4 @@ function matchLabel(options) {
       res.send(JSON.stringify({ label: '__NO_MATCH__' }));
     }
   });
-};
-
-module.exports = {
-  trainClassifier,
-  matchLabel
-};
+}

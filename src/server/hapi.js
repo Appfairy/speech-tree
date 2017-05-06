@@ -1,6 +1,6 @@
-const boom = require('boom');
-const pack = require('../../package.json');
-const createSpeechClassifier = require('./speech_classifier');
+import boom from 'boom';
+import pack from '../../package.json';
+import createSpeechClassifier from './speech_classifier';
 
 register.attributes = {
   name: pack.name,
@@ -59,4 +59,4 @@ function register(server, options, next) {
   });
 }
 
-module.exports = register;
+export default register;
