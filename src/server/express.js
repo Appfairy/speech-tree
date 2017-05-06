@@ -54,7 +54,8 @@ export function matchLabel(url = LABEL_DEFAULT_ENDPOINT) {
   // After classifier has been trained, register route
   router.get(url, (req, res) => {
     if (!classifier) {
-      return next(Error('classifier must be trained'));
+      res.status(400);
+      return res.send('classifier must be initialized');
     }
 
     const sentence = req.query.sentence;
