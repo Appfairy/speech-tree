@@ -16,7 +16,7 @@ function getSentenceLabel(sentence) {
 }
 
 // In case there was no match, try to match a label to the given sentence
-annyang.addCallback('resultNoMatch', [sentence], {
+annyang.addCallback('resultNoMatch', [sentence], () => {
   // Label matching is not necessarily enabled
   if (!labelMatchingEnabled) return;
 

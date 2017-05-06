@@ -1,5 +1,5 @@
 const boom = require('boom');
-const pack = require('../package.json');
+const pack = require('../../package.json');
 const createSpeechClassifier = require('./speech_classifier');
 
 register.attributes = {
