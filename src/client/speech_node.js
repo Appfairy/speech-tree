@@ -63,4 +63,4 @@ class SpeechNode {
   }
 }
 
-export default rootSpeechNode;
+export default SpeechNode;

@@ -1,6 +1,12 @@
 import annyang from 'annyang';
-import labelMatcher from './label_matcher';
 import SpeechNode from './speech_node';
+
+import {
+  getLabelURL,
+  setLabelURL,
+  enableLabelMatching,
+  disableLabelMatching
+} from './label_matcher';
 
 const rootSpeechNode = new SpeechNode();
 
@@ -12,16 +18,16 @@ Object.keys(annyang)
 
 // Export label matcher methods
 Object.assign(rootSpeechNode, {
-  enableLabelMatching: labelMatcher.enableLabelMatching.bind(labelMatcher),
-  disableLabelMatching: labelMatcher.disableLabelMatching.bind(labelMatcher),
+  enableLabelMatching: enableLabelMatching,
+  disableLabelMatching: disableLabelMatching,
 });
 
 // Export getters and setters as native properties
 Object.defineProperty(rootSpeechNode, 'labelURL', {
   configurable: true,
   enumerable: true,
-  get: labelMatcher.getLabelURL.bind(labelMatcher),
-  set: labelMatcher.setLabelURL.bind(labelMatcher)
+  get: getLabelURL,
+  set: setLabelURL
 });
 
 export default rootSpeechNode;
