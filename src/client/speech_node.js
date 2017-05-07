@@ -1,7 +1,8 @@
 import annyang from 'annyang';
 
 class SpeechNode {
-  constructor() {
+  constructor(parentNode) {
+    this.parentNode = parentNode;
     this.commandNamesBatch = [];
     this.commands = {};
 
@@ -43,7 +44,7 @@ class SpeechNode {
 
       if (typeof matchesHandler != 'function') return;
 
-      matchesHandler(new SpeechNode());
+      matchesHandler(new SpeechNode(this));
     };
 
     const commandsBatch = this.commandNamesBatch.reduce((commandsBatch, commandName) => {
@@ -60,6 +61,19 @@ class SpeechNode {
     return {
       on: this.on.bind(this)
     };
+  }
+
+  getCommandsRecursively() {
+    let parentCommands;
+
+    if (this.parentNode) {
+      parentCommands = this.parentNode.getCommandsRecursively();
+    }
+    else {
+      parentCommands = {};
+    }
+
+    return Object.assign(parentCommands, this.commands);
   }
 }
 
