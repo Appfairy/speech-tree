@@ -24,7 +24,7 @@ class SpeechNode {
     this.commandNamesBatch.push(commandName);
 
     return {
-      on: this.on.bind(this),
+      or: this.on.bind(this),
       invoke: this.invoke.bind(this)
     };
   }

@@ -65,6 +65,6 @@ export function buildBulkOperaion(node, operations = []) {
 // This is optional for the simple reason that not every user is interested in such
 // functionality, therefore we can save ourselves some heavy-script loading
 export const setCompromise = (lib) => {
-   nlp = lib;
-   proto = nlp().__proto__;
-}
+  nlp = lib;
+  proto = nlp().__proto__;
+};
