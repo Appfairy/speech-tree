@@ -8,7 +8,9 @@ module.exports = {
   },
   output: {
     path: path.resolve(__dirname, '../dist/server'),
-    filename: '[name].js'
+    filename: '[name].js',
+    library: '',
+    libraryTarget: 'commonjs2'
   },
   target: 'node',
   module: {

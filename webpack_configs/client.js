@@ -9,7 +9,9 @@ module.exports = {
   ],
   output: {
     path: path.resolve(__dirname, '../dist'),
-    filename: 'client.min.js'
+    filename: 'client.min.js',
+    library: '',
+    libraryTarget: 'commonjs2'
   },
   module: {
     loaders: [
