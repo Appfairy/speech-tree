@@ -1,4 +1,5 @@
 import annyang from 'annyang';
+import { setCompromise } from './bulk_operator';
 import SpeechNode from './speech_node';
 
 import {
@@ -12,9 +13,9 @@ const rootSpeechNode = new SpeechNode();
 
 // Export annyang methods
 Object.keys(annyang)
-  .filter((k) => typeof annyang[k] == 'function')
-  .filter((k) => rootSpeechNode[k] == null)
-  .forEach((k) => rootSpeechNode[k] = annyang[k].bind(annyang));
+  .filter(k => typeof annyang[k] == 'function')
+  .filter(k => rootSpeechNode[k] == null)
+  .forEach(k => rootSpeechNode[k] = annyang[k].bind(annyang));
 
 // Export label matcher methods
 Object.assign(rootSpeechNode, {
@@ -23,6 +24,12 @@ Object.assign(rootSpeechNode, {
 });
 
 // Export getters and setters as native properties
+Object.defineProperty(rootSpeechNode, 'compromise', {
+  configurable: true,
+  enumerable: true,
+  set: setCompromise
+});
+
 Object.defineProperty(rootSpeechNode, 'labelURL', {
   configurable: true,
   enumerable: true,

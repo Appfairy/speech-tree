@@ -1,4 +1,5 @@
 import annyang from 'annyang';
+import { buildBulkOperaion } from './bulk_operator';
 
 class SpeechNode {
   constructor(parentNode) {
@@ -13,7 +14,7 @@ class SpeechNode {
 
   on(commandName) {
     if (!commandName) {
-      throw TypeError('command name must be provided');
+      return buildBulkOperaion(this);
     }
 
     if (typeof commandName != 'string') {
