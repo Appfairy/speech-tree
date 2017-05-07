@@ -1,3 +1,4 @@
+var fs = require('fs');
 var path = require('path');
 var UnminifiedWebpackPlugin = require('unminified-webpack-plugin');
 var webpack = require('webpack');
@@ -35,5 +36,17 @@ module.exports = {
     }),
     new UnminifiedWebpackPlugin()
   ],
-  externals: [nodeExternals()]
+  externals: [nodeExternals()],
+  resolve: {
+    alias: (function (alias) {
+      const libsDir = path.resolve(__dirname, '../src/client/libs');
+      const libs = fs.readdirSync(libsDir);
+
+      libs.forEach(function (lib) {
+        alias[lib] = path.resolve(libsDir, lib);
+      });
+
+      return alias;
+    })({});
+  }
 };

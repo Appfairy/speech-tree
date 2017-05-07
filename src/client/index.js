@@ -1,40 +1,15 @@
-import annyang from 'annyang';
-import { setCompromise } from './bulk_operator';
+import SpeechListener from './speech_listener';
 import SpeechNode from './speech_node';
 
-import {
-  getLabelURL,
-  setLabelURL,
-  enableLabelMatching,
-  disableLabelMatching
-} from './label_matcher';
+const speechListener = new SpeechListener();
+const speechNode = new SpeechNode();
+const speech = Object.assign(speechListener, speechNode);
 
-const rootSpeechNode = new SpeechNode();
-
-// Export annyang methods
-Object.keys(annyang)
-  .filter(k => typeof annyang[k] == 'function')
-  .filter(k => rootSpeechNode[k] == null)
-  .forEach(k => rootSpeechNode[k] = annyang[k].bind(annyang));
-
-// Export label matcher methods
-Object.assign(rootSpeechNode, {
-  enableLabelMatching: enableLabelMatching,
-  disableLabelMatching: disableLabelMatching,
-});
-
-// Export getters and setters as native properties
-Object.defineProperty(rootSpeechNode, 'compromise', {
+Object.defineProperty(speech, 'labelURL', {
   configurable: true,
   enumerable: true,
-  set: setCompromise
+  get: () => SpeechNode.labelURL,
+  set: (value) => SpeechNode.labelURL = value
 });
 
-Object.defineProperty(rootSpeechNode, 'labelURL', {
-  configurable: true,
-  enumerable: true,
-  get: getLabelURL,
-  set: setLabelURL
-});
-
-export default rootSpeechNode;
+export default speech;
