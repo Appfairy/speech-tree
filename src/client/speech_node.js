@@ -51,7 +51,7 @@ class SpeechNode {
       return commandsBatch;
     }, {});
 
-    Object.assign(this.commands, this.commandsBatch);
+    Object.assign(this.commands, commandsBatch);
 
     annyang.addCommands(this.commands);
 
