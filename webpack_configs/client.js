@@ -17,7 +17,7 @@ module.exports = {
   module: {
     loaders: [
       {
-        test: /\.(js|jsx)$/,
+        test: /\.js$/,
         exclude: [/node_modules/],
         loader: 'babel-loader'
       },
@@ -42,11 +42,14 @@ module.exports = {
       const libsDir = path.resolve(__dirname, '../src/client/libs');
       const libs = fs.readdirSync(libsDir);
 
-      libs.forEach(function (lib) {
+      libs.map(function (lib) {
+        return lib.split('.')[0];
+      })
+      .forEach(function (lib) {
         alias[lib] = path.resolve(libsDir, lib);
       });
 
       return alias;
-    })({});
+    })({})
   }
 };

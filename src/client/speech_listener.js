@@ -33,9 +33,11 @@ class SpeechListener {
       test.forEach(([test, handler]) => {
         this.on(test, handler);
       });
+
+      return;
     }
 
-    const handlers = this._events.get(test);
+    let handlers = this._events.get(test);
 
     if (!handlers) {
       handlers = new Map();
@@ -74,20 +76,22 @@ class SpeechListener {
         result = sentence.match(test);
       }
 
-      if (result instanceof Array) {
+      if (!(result instanceof Promise)) {
         result = Promise.resolve(result);
       }
 
-      if (typeof result.then != 'function' ||
-          typeof result.catch != 'function') return;
+      result.then((args) => {
+        if (!args) return;
 
-      promise.then((args) => {
-        if (!(args instanceof Array)) return;
+        args = [].concat(args);
 
         handlers.forEach((handler) => {
           handler.apply(null, ...args);
         });
       })
+      .catch((error) => {
+        console.error(error);
+      });
     });
   }
 

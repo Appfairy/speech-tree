@@ -1,8 +1,6 @@
 import { LABEL_DEFAULT_ENDPOINT, LABEL_NOT_FOUND } from '../consts';
 
 class SpeechNode {
-  static labelURL = LABEL_DEFAULT_ENDPOINT
-
   constructor(speechListener, parentNode) {
     this.speechListener = speechListener;
     this.parentNode = parentNode;
@@ -15,31 +13,7 @@ class SpeechNode {
   }
 
   on(test) {
-    if (!test) return {
-      label: this.label.bind(this)
-    };
-
     this.testsBatch.push(test);
-
-    return {
-      or: this.on.bind(this),
-      invoke: this.invoke.bind(this)
-    };
-  }
-
-  label(expectedLabel) {
-    this.testsBatch.push(async (sentence) => {
-      // e.g. ' ' (space) will be replaced with '%20'
-      const encodedSentence = encodeURIComponent(sentence);
-      const labelQueryURL = SpeechNode.labelURL + '?sentence=' + encodedSentence;
-      const request = new Request(labelQueryURL);
-      const response = await fetch(request).then(response => response.json());
-      const actualLabel = response.label;
-
-      if (actualLabel == expectedLabel) {
-        return [sentence, actualLabel];
-      }
-    });
 
     return {
       or: this.on.bind(this),
