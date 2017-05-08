@@ -30,9 +30,16 @@ class SpeechListener {
 
   on(test, handler) {
     if (test instanceof Array) {
-      test.forEach(([test, handler]) => {
-        this.on(test, handler);
-      });
+      if (handler) {
+        test.forEach((test) => {
+          this.on(test, handler);
+        });
+      }
+      else {
+        test.forEach(([test, handler]) => {
+          this.on(test, handler);
+        });
+      }
 
       return;
     }
@@ -72,8 +79,11 @@ class SpeechListener {
       if (typeof test == 'function') {
         result = test(sentence);
       }
-      else {
+      else if (test instanceof RegExp) {
         result = sentence.match(test);
+      }
+      else {
+        result = result === test && test;
       }
 
       if (!result) return;
@@ -89,7 +99,7 @@ class SpeechListener {
         args = [].concat(args);
 
         handlers.forEach((handler) => {
-          handler.apply(null, ...args);
+          handler(...args);
         });
       })
       .catch((error) => {

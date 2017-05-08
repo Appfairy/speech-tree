@@ -34,11 +34,11 @@ class SpeechNode {
       this.speechListener.off();
       this.speechListener.on(this.getTestsRecursively());
 
-      const matchesHandler = handler(...matches);
+      const speechNodeRequest = handler(...matches);
 
-      if (typeof matchesHandler != 'function') return;
+      if (typeof speechNodeRequest != 'function') return;
 
-      matchesHandler(new SpeechNode(this.speechListener, this));
+      speechNodeRequest(new SpeechNode(this.speechListener, this));
     };
 
     this.speechListener.on(this.testsBatch, wrappedHandler);
