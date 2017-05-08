@@ -27,17 +27,17 @@ class SpeechNode {
     };
   }
 
-  label(labelName) {
+  label(expectedLabel) {
     this.testsBatch.push(async (sentence) => {
       // e.g. ' ' (space) will be replaced with '%20'
       const encodedSentence = encodeURIComponent(sentence);
       const labelQueryURL = SpeechNode.labelURL + '?sentence=' + encodedSentence;
       const request = new Request(labelQueryURL);
       const response = await fetch(request).then(response => response.json());
-      const label = response.label;
+      const actualLabel = response.label;
 
-      if (label != LABEL_NOT_FOUND) {
-        return [sentence, labelName];
+      if (actualLabel == expectedLabel) {
+        return [sentence, actualLabel];
       }
     });
 
