@@ -76,7 +76,10 @@ class SpeechListener {
         result = sentence.match(test);
       }
 
-      if (!(result instanceof Promise)) {
+      if (!result) return;
+
+      if (typeof result.then != 'function' ||
+          typeof result.catch != 'function') {
         result = Promise.resolve(result);
       }
 
