@@ -14,8 +14,7 @@
   },
   "dependencies": {
     "boom": "^4.3.1",
-    "express": "^4.15.2",
-    "natural": "^0.5.1"
+    "express": "^4.15.2"
   },
   "devDependencies": {
     "babel-loader": "^7.0.0",
@@ -25,7 +24,6 @@
     "webpack-node-externals": "^1.5.4"
   },
   "keywords": [
-    "annyang",
     "natural-language-processing",
     "speech",
     "speech-recognition",

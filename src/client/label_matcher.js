@@ -1,4 +1,4 @@
-import { LABEL_DEFAULT_ENDPOINT, LABEL_NOT_FOUND } from '../consts';
+import { LABEL_DEFAULT_ENDPOINT } from '../consts';
 
 let labelURL = LABEL_DEFAULT_ENDPOINT;
 

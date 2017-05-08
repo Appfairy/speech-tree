@@ -1,7 +1,6 @@
 import boom from 'boom';
-import natural from 'natural';
 import pack from '../../package.json';
-import { LABEL_DEFAULT_ENDPOINT, LABEL_NOT_FOUND } from '../consts';
+import { LABEL_DEFAULT_ENDPOINT } from '../consts';
 
 register.attributes = {
   name: pack.name,
@@ -10,8 +9,7 @@ register.attributes = {
 
 // Options:
 // - path (String): The path of the registered route
-// - getClassifier (Function): Required. A user-defined method which should return
-//   an instance of natural.BayesClassifier
+// - classifier (Function): A sentence-to-label mapping function
 async function register(server, options, next) {
   // Apply defaults to options
   options = Object.assign({
@@ -22,43 +20,18 @@ async function register(server, options, next) {
     return next(TypeError('path must be a string'));
   }
 
-  if (!options.getClassifier) {
-    return next(TypeError('classifier getter must be specified'));
+  if (!options.classifier) {
+    return next(TypeError('classifier must be specified'));
   }
 
-  if (typeof options.getClassifier != 'function') {
-    return next(TypeError('classifier getter must be a function'));
+  if (typeof options.classifier != 'function') {
+    return next(TypeError('classifier must be a function'));
   }
 
-  const getClassifierResult = options.getClassifier();
-  let classifierPromise = getClassifierResult;
-
-  if (typeof getClassifierResult.then != 'function' ||
-      typeof getClassifierResult.catch != 'function') {
-    classifierPromise = Promise.resolve(classifierPromise);
-  }
-
-  let classifier;
-
-  try {
-    classifier = await classifierPromise();
-  }
-  catch (err) {
-    return next(err);
-  }
-
-  if (!(classifier instanceof natural.BayesClassifier)) {
-    return next(TypeError([
-      'classifier getter must return either an instance of natural.BayesClassifier or',
-      'an instance of Promise which returns an instance of natural.BayesClassifier'
-    ].join()));
-  }
-
-  // After classifier has been trained, register route
   server.route({
     method: ['GET'],
     path: options.path,
-    handler(request, reply) {
+    async handler(request, reply) {
       const sentence = request.query.sentence;
 
       if (!sentence) {
@@ -66,14 +39,23 @@ async function register(server, options, next) {
         return reply(error);
       }
 
-      // Classifier might not be trained for some sentences
-      try {
-        const label = classifier.classify(sentence);
-        reply({ label });
+      let label = options.classifier(sentence);
+
+      if (!label) {
+        const error = boom.notFound('label not found');
+        return reply(error);
       }
-      catch (err) {
-        reply({ label: LABEL_NOT_FOUND });
+
+      if (typeof label.then == 'function' &&
+          typeof label.catch == 'function') {
+        label = await label;
       }
+
+      if (typeof label != 'string') {
+        throw TypeError('label must be a string');
+      }
+
+      reply({ label });
     }
   });
 
