@@ -24,9 +24,6 @@
     "webpack": "^2.5.0",
     "webpack-node-externals": "^1.5.4"
   },
-  "peerDependencies": {
-    "annyang": "^2.6.0"
-  },
   "keywords": [
     "annyang",
     "natural-language-processing",
