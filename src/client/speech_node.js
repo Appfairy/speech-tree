@@ -1,6 +1,14 @@
 import { LABEL_DEFAULT_ENDPOINT } from '../consts';
 import { SpeechListener } from './speech_listener';
 
+// An instance of the SpeechNode class represents a single node in an entire tree where
+// we can register events to voice commands in sequence.
+//
+// Example:
+//
+//   - "Show me a list of all my expenses throughout the entire year"
+//   - "Please sort the list"
+//
 class SpeechNode {
   constructor(speechListener, parentNode) {
     if (speechListener == null) {
@@ -17,9 +25,16 @@ class SpeechNode {
 
     this.speechListener = speechListener;
     this.parentNode = parentNode;
+    // We can register multiple tests for a single handler. This array is used to
+    // accumulate tests until their handler is being specified, in which case this array
+    // pipes itself to the global tests array
     this.testsBatch = [];
+    // A test-handler pairs array which will be used to register itself after the speech
+    // commands map has been zeroed
     this.tests = [];
 
+    // This is a nice chaining technique where we ensure that the user has no access to
+    // functions that do not belong to the upcoming link in the sequence
     return {
       on: this.on.bind(this)
     };
@@ -36,6 +51,7 @@ class SpeechNode {
       throw TypeError('test must be a regular expression, a string or a function');
     }
 
+    // Accumulate test for the current session
     this.testsBatch.push(test);
 
     return {
@@ -54,9 +70,13 @@ class SpeechNode {
     }
 
     const wrappedHandler = (...matches) => {
+      // Re-register all tests of the current node and above, discarding all events
+      // of child nodes
       this.speechListener.off();
       this.speechListener.on(this.getTestsRecursively());
 
+      // If the handler returns a function it means that the user would like to keep
+      // building the speech tree
       const speechNodeRequest = handler(...matches);
 
       if (typeof speechNodeRequest != 'function') return;
@@ -66,10 +86,12 @@ class SpeechNode {
 
     this.speechListener.on(this.testsBatch, wrappedHandler);
 
+    // Compose test-handler pairs
     const testsBatch = this.testsBatch.map((test) => {
       return [test, handler];
     });
 
+    // Pipe tests for current session
     this.tests.push(...testsBatch);
     this.testsBatch = [];
 
@@ -78,6 +100,7 @@ class SpeechNode {
     };
   }
 
+  // Gets tests of the current node and all its parents
   getTestsRecursively() {
     let parentTests;
 

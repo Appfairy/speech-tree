@@ -1,10 +1,8 @@
 import SpeechRecognition from 'speech_recognition';
 import SpeechEmitter from './speech_emitter';
 
-// SpeechListener is the same as an event emitter, only it listens to speech events based
-// on strings, regular expressions and manual test functions. The test functions should
-// return an array of arguments (or a promise of an array of arguments) which should be
-// invoked with the event
+// SpeechListener wraps the native speech recognition web API and will trigger an event
+// whenever there is an incoming sentence
 class SpeechListener extends SpeechEmitter {
   get listening() {
     return this._listening;

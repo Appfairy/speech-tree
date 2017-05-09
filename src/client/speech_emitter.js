@@ -1,9 +1,14 @@
+// This is a special event emitter which invokes a handler whenever there was a match
+// with the triggered sentence. The match can be done based on a string,
+// regular expression or a custom handler. The handler can return a promise as well,
+// making the matching process asynchronous and not necessarily synchronous
 class SpeechEmitter {
   constructor(options = {}) {
     this._events = new Map();
     this._handlers = new Map();
   }
 
+  // Register a permanent event until being disposed manually
   on(test, handler) {
     if (test instanceof Array) {
       if (handler != null) {
@@ -52,6 +57,7 @@ class SpeechEmitter {
     handlers.set(handler, handler);
   }
 
+  // Register a one time event
   once(test, handler) {
     if (test instanceof Array) {
       if (handler != null) {
@@ -105,17 +111,21 @@ class SpeechEmitter {
     handlers.set(handler, wrappedHandler);
   }
 
+  // Dispose event
   off(test, handler) {
+    // If non was provided, dispose all events
     if (test == null && handler == null) {
       this._events = new Map();
       return;
     }
 
+    // If handler wasn't provided, dispose all handlers matching the provided test
     if (handler == null) {
       this._events.delete(test);
       return;
     }
 
+    // Else, cancel the specifically provided handler
     const handlers = this._events.get(test);
 
     if (handlers != null) {
@@ -123,6 +133,7 @@ class SpeechEmitter {
     }
   }
 
+  // Trigger an event. The rest of the arguments will be forwarded to the test handlers
   trigger(sentence, ...args) {
     if (sentence == null) {
       throw TypeError('sentence must be provided');
