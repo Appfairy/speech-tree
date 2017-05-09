@@ -1,7 +1,20 @@
-import { LABEL_DEFAULT_ENDPOINT, LABEL_NOT_FOUND } from '../consts';
+import { LABEL_DEFAULT_ENDPOINT } from '../consts';
+import { SpeechListener } from './speech_listener';
 
 class SpeechNode {
   constructor(speechListener, parentNode) {
+    if (speechListener == null) {
+      throw TypeError('speech listener must be provided');
+    }
+
+    if (!(speechListener instanceof SpeechListener)) {
+      throw TypeError('first argument must be a speech listener');
+    }
+
+    if (parentNode && !(parentNode instanceof SpeechNode)) {
+      throw TypeError('second argument must be a speech node');
+    }
+
     this.speechListener = speechListener;
     this.parentNode = parentNode;
     this.testsBatch = [];
@@ -13,6 +26,16 @@ class SpeechNode {
   }
 
   on(test) {
+    if (test == null) {
+      throw TypeError('test must be provided');
+    }
+
+    if (!(test instanceof RegExp) &&
+        typeof test != 'string' &&
+        typeof test != 'function') {
+      throw TypeError('test must be a regular expression, a string or a function');
+    }
+
     this.testsBatch.push(test);
 
     return {
@@ -22,7 +45,7 @@ class SpeechNode {
   }
 
   invoke(handler) {
-    if (!handler) {
+    if (handler == null) {
       throw TypeError('test handler must be provided');
     }
 
