@@ -27,13 +27,13 @@ import SpeechTree from 'speech-tree/server/hapi';
 ```
 
 **Jump to:**
-  - [Client](#api-client)
-    - [Speech Listener](#api-client-speech-listener)
-    - [Speech Node](#api-client-speech-node)
-    - [Label Matcher](#api-client-label-matcher)
-  - [Server](#api-server)
-    - [Express Middleware](#api-server-express-middleware)
-    - [Hapi Plugin](#api-server-hapi-plugin)
+  - [Client](#client)
+    - [Speech Listener](#speech-listener)
+    - [Speech Node](#speech-node)
+    - [Label Matcher](#label-matcher)
+  - [Server](#server)
+    - [Express Middleware](#express-middleware)
+    - [Hapi Plugin](#hapi-plugin)
 
 ### Client
 
@@ -140,7 +140,7 @@ listener.start();
 
 ### Server
 
-Everything that is related to classifying sentence should be done on the server, sine such a process requires trained speech models which can classify sentences efficiently, something which requires lots of time to initialize; Therefore, training data should be stored on the server once a model has finished its training session. In addition, data can be collected from multiple users and can be stored on the server, to improve our speech model accordingly. Currently, the route end-point for classifying sentence can be registered for [hapi](https://hapijs.com/) and [express](https://expressjs.com/) servers, besides that there aren't any future plans for more server platforms.
+Everything that is related to classifying sentence should be done on the server, sine such a process requires trained speech models which can classify sentences efficiently, something which requires lots of time to initialize; Therefore, training data should be stored on the server once a model has finished its training session. In addition, data can be collected from multiple users and can be stored on the server, to improve our speech model accordingly. The classification process doesn't necessarily have to be synchronous, in case it returns a promise. Currently, the route end-point for classifying sentence can be registered for [hapi](https://hapijs.com/) and [express](https://expressjs.com/) servers, besides that there aren't any future plans for more server platforms.
 
 #### Express Middleware
 
