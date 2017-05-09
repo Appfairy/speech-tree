@@ -1,8 +1,15 @@
 import express from 'express';
 import { LABEL_DEFAULT_ENDPOINT } from '../consts';
 
+// Returns an express middle-ware which will register a route endpoint for handling
+// labels classifications for incoming sentences
+//
+// Options:
+//
+//   - path (String): The path of the registered route
+//   - classifier (Function): A sentence-to-label mapping function
+//
 function middleware(options) {
-  // Apply defaults to options
   options = Object.assign({
     url: LABEL_DEFAULT_ENDPOINT
   }, options);
@@ -21,7 +28,6 @@ function middleware(options) {
 
   const router = express.Router();
 
-  // After classifier has been trained, register route
   router.get(url, async (req, res) => {
     const sentence = req.query.sentence;
 

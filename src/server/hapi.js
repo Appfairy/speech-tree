@@ -7,11 +7,15 @@ register.attributes = {
   version: pack.version
 };
 
+// Returns hapi plug-in which will register a route endpoint for handling
+// labels classifications for incoming sentences
+//
 // Options:
-// - path (String): The path of the registered route
-// - classifier (Function): A sentence-to-label mapping function
+//
+//   - path (String): The path of the registered route
+//   - classifier (Function): A sentence-to-label mapping function
+//
 async function register(server, options, next) {
-  // Apply defaults to options
   options = Object.assign({
     path: LABEL_DEFAULT_ENDPOINT
   }, options);
