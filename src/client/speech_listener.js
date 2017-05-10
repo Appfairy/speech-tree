@@ -14,7 +14,7 @@ class SpeechListener extends SpeechEmitter {
     this._listening = false;
     this._speechRecognition = new SpeechRecognition();
     this._speechRecognition.continuous = options.continuous;
-    this._onresult = this._handleSpeechResult.bind(this);
+    this._speechRecognition.onresult = this._handleSpeechResult.bind(this);
   }
 
   start() {
