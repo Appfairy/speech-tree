@@ -21,10 +21,14 @@
     "babel-loader": "^7.0.0",
     "babel-preset-es2015": "^6.24.1",
     "jest-cli": "^20.0.0",
-    "lodash.after": "^4.0.4",
+    "nock": "^9.0.13",
+    "node-fetch": "^1.6.3",
     "unminified-webpack-plugin": "^1.2.0",
     "webpack": "^2.5.0",
     "webpack-node-externals": "^1.5.4"
+  },
+  "jest": {
+    "setupTestFrameworkScriptFile": "./test_setup.js"
   },
   "keywords": [
     "natural-language-processing",

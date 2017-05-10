@@ -1,11 +1,10 @@
-import after from 'lodash.after';
 import SpeechEmitter from './speech_emitter';
 import SpeechNode from './speech_node';
 
-let emitter;
-let speech;
-
 describe('SpeechNode() class', () => {
+  let emitter;
+  let speech;
+
   beforeEach(() => {
     emitter = new SpeechEmitter();
     speech = new SpeechNode(emitter);

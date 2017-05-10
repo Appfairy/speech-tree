@@ -31,7 +31,7 @@ function createLabelMatcher(speechEmitter, options = {}) {
     throw TypeError('speech emitter must be provided');
   }
 
-  if (!(speechEmitter instanceof SpeechListener)) {
+  if (!(speechEmitter instanceof SpeechEmitter)) {
     throw TypeError('first argument must be a speech emitter');
   }
 
@@ -61,6 +61,9 @@ function createLabelMatcher(speechEmitter, options = {}) {
       setTimeout(() => {
         speechEmitter.once(sentencePattern, fetchHandler);
       });
+    })
+    .catch((error) => {
+      console.error(error);
     });
   };
 
@@ -102,7 +105,7 @@ function createLabelMatcher(speechEmitter, options = {}) {
   // The disposal methods disposes all the registered label events and it stops the
   // auto-fetching to the server whenever there is an incoming sentence
   matchLabel.dispose = () => {
-    speechEmitter.off(test, handler);
+    speechEmitter.off(sentencePattern, fetchHandler);
     labelEmitter.off();
   };
 
