@@ -97,7 +97,7 @@ class SpeechEmitter {
     }
 
     const wrappedHandler = (...args) => {
-      self.off(pattern, handler);
+      this.off(test, handler);
       handler(...args);
     };
 
@@ -150,10 +150,10 @@ class SpeechEmitter {
         result = test(sentence, ...args);
       }
       else if (test instanceof RegExp) {
-        result = sentence.match(test);
+        result = sentence.match(new RegExp(test, 'i'));
       }
-      else {
-        result = result === test && test;
+      else if (test.toLowerCase() === sentence.toLowerCase()) {
+        result = sentence;
       }
 
       if (result == null) return;

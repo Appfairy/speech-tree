@@ -1,5 +1,5 @@
 import { LABEL_DEFAULT_ENDPOINT } from '../consts';
-import { SpeechListener } from './speech_listener';
+import SpeechListener from './speech_listener';
 
 // An instance of the SpeechNode class represents a single node in an entire tree where
 // we can register events to voice commands in sequence.
@@ -88,7 +88,7 @@ class SpeechNode {
 
     // Compose test-handler pairs
     const testsBatch = this.testsBatch.map((test) => {
-      return [test, handler];
+      return [test, wrappedHandler];
     });
 
     // Pipe tests for current session

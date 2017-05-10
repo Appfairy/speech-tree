@@ -17,7 +17,7 @@ import SpeechListener from './speech_listener';
 //
 let labelURL = LABEL_DEFAULT_ENDPOINT;
 
-Object.defineProperty(matchLabel, 'labelURL', {
+Object.defineProperty(createLabelMatcher, 'labelURL', {
   configurable: true,
   enumerable: true,
   get: () => labelURL,
