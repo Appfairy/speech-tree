@@ -68,16 +68,12 @@ describe('SpeechEmitter() class', () => {
 
       emitter.emit('hello world');
       emitter.emit('hello world');
-
-      if (!time) {
-        next(Error('event handler should have been called multiple times'));
-      }
     });
   });
 
   describe('once() method', () => {
     test('string event listeners registration', (next) => {
-      emitter.on('hello world', (sentence) => {
+      emitter.once('hello world', (sentence) => {
         expect(sentence).toEqual('hello world');
 
         next();
@@ -87,7 +83,7 @@ describe('SpeechEmitter() class', () => {
     });
 
     test('regular expression event listeners registration', (next) => {
-      emitter.on(/hello (.+)/, (sentence, subject) => {
+      emitter.once(/hello (.+)/, (sentence, subject) => {
         expect(sentence).toEqual('hello world');
         expect(subject).toEqual('world');
 
@@ -98,7 +94,7 @@ describe('SpeechEmitter() class', () => {
     });
 
     test('function event listeners registration', (next) => {
-      emitter.on((sentence, subject) => {
+      emitter.once((sentence, subject) => {
         return [sentence, subject];
       }, (sentence, subject) => {
         expect(sentence).toEqual('hello world');
@@ -111,7 +107,7 @@ describe('SpeechEmitter() class', () => {
     });
 
     test('async function event listeners registration', (next) => {
-      emitter.on((sentence, subject) => {
+      emitter.once((sentence, subject) => {
         return Promise.resolve([sentence, subject]);
       }, (sentence, subject) => {
         expect(sentence).toEqual('hello world');
@@ -126,64 +122,64 @@ describe('SpeechEmitter() class', () => {
     test('one-time event listener registration', (next) => {
       let time = 0;
 
-      emitter.on('hello world', (sentence) => {
+      emitter.once('hello world', (sentence) => {
         expect(sentence).toEqual('hello world');
+        time++;
+      });
 
-        if (time++) {
-          next(Error('event handler should have been called one-time only'));
-        }
+      emitter.once('next', () => {
+        if (time == 1) next();
       });
 
       emitter.emit('hello world');
       emitter.emit('hello world');
-
-      next();
+      emitter.emit('next');
     });
   });
 
   describe('off() method', () => {
-    test('handler specific event listener cancellation', () => {
+    test('handler specific event listener cancellation', (next) => {
       const test = 'hello world';
-      const handler = () => {
-        throw Error('handler should not have been called');
-      };
+      const handler = () => next = Function();
 
       emitter.on(test, handler);
+      emitter.on('next', next);
       emitter.off(test, handler);
       emitter.emit(test);
+      emitter.emit('next');
     });
 
-    test('test specific event listeners cancellation', () => {
+    test('test specific event listeners cancellation', (next) => {
       const test = 'hello world';
-      const handler = () => {
-        throw Error('handler should not have been called');
-      };
+      const handler = () => next = Function();
 
       emitter.on(test, handler);
+      emitter.on('next', next);
       emitter.off(test);
       emitter.emit(test);
+      emitter.emit('next');
     });
 
-    test('inclusive event listeners cancellation', () => {
+    test('inclusive event listeners cancellation', (next) => {
       const test = 'hello world';
-      const handler = () => {
-        throw Error('handler should not have been called');
-      };
+      const handler = () => next = Function();
 
       emitter.on(test, handler);
       emitter.off();
+      emitter.on('next', next);
       emitter.emit(test);
+      emitter.emit('next');
     });
 
-    test('one-time event listener cancellation', () => {
+    test('one-time event listener cancellation', (next) => {
       const test = 'hello world';
-      const handler = () => {
-        throw Error('handler should not have been called');
-      };
+      const handler = () => next = Function();
 
       emitter.once(test, handler);
+      emitter.on('next', next);
       emitter.off(test, handler);
       emitter.emit(test);
+      emitter.emit('next');
     });
   });
 });

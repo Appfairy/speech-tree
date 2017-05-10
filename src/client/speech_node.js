@@ -74,8 +74,8 @@ class SpeechNode {
       // of child nodes
       this.speechEmitter.off();
 
-      this.getTestsRecursively().forEach(([text, handler]) => {
-        this.speechEmitter.on(text, handler);
+      this.getTestsRecursively().forEach(([test, handler]) => {
+        this.speechEmitter.on(test, handler);
       });
 
       // If the handler returns a function it means that the user would like to keep
@@ -99,10 +99,6 @@ class SpeechNode {
     // Pipe tests for current session
     this.tests.push(...testsBatch);
     this.testsBatch = [];
-
-    return {
-      on: this.on.bind(this)
-    };
   }
 
   // Gets tests of the current node and all its parents
