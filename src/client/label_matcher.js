@@ -44,10 +44,10 @@ function createLabelMatcher(speechListener, options = {}) {
 
   // This will be used to register events for fetched labels
   const labelEmitter = new SpeechEmitter();
-  const test = /.*/;
+  const sentencePattern = /.*/;
 
   // This will fetch labels and trigger them whenever there is an incoming sentence
-  const handler = (sentence) => {
+  const fetchHandler = (sentence) => {
     // e.g. ' ' (space) will be replaced with '%20'
     const encodedSentence = encodeURIComponent(sentence);
     const labelQueryURL = `${options.labelURL}?sentence=${encodedSentence}`;
@@ -60,14 +60,14 @@ function createLabelMatcher(speechListener, options = {}) {
       // Here we wait run the registration in the next event loop to ensure all promises
       // have been resolved
       setTimeout(() => {
-        speechListener.once(test, handler);
+        speechListener.once(sentencePattern, fetchHandler);
       });
     });
   };
 
   // Here we use the once() method and not the on() method we re-register the event
   // listener once a fetch has been done
-  speechListener.once(test, handler);
+  speechListener.once(sentencePattern, fetchHandler);
 
   // A factory function which will generate an event handler for matching sentences
   // against fetched labels. Be sure to call the dispose() method once you don't need
@@ -85,16 +85,18 @@ function createLabelMatcher(speechListener, options = {}) {
     // An async event handler which returns a promise
     return () => new Promise((resolve) => {
       // The promise will resolve itself whenever an emitted label matches the
-      // expected label.
-      // TODO: We can force memory leak by removing the label matcher event listener
-      // leaving the event listener above still registered. This should be fixed in the
-      // future
-      labelEmitter.once((actualLabel, sentence) => {
+      // expected label
+      const labelTest = (actualLabel, sentence) => {
+        // This makes it a one-time test
+        labelEmitter.off(labelTest);
+
         if (actualLabel == label) {
           // These are the arguments with whom the event handler will be invoked with
-          return [[sentence, label]];
+          return [sentence, label];
         }
-      }, resolve);
+      };
+
+      labelEmitter.on(labelTest, resolve);
     });
   };
 
