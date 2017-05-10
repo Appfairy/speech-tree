@@ -147,20 +147,21 @@ Everything that is related to classifying sentence should be done on the server,
 **example:**
 ```js
 import natural from 'natural';
-import SpeechTree from 'speech-tree/server/express';
+import speechTreeRouter from 'speech-tree/server/express';
 
 // ... express server initialization logic ....
 
 const classifier = new natural.BayesClassifier();
 
-classifier.addDocument('I would like you to show me a report', 'showReport');
-classifier.addDocument('Can you please show me a report', 'showReport');
-classifier.addDocument('I demand you to show me a report', 'showReport');
+classifier.addDocument("show list", 'showList');
+classifier.addDocument("sort list", 'sortList');
+classifier.addDocument("show picture of cats", 'showCatsPicture');
+classifier.addDocument("show picture of kittens", 'showCatsPicture');
 
 classifier.train();
 
 // Route 'speech-tree/label' will be registered unless specified else wise
-app.use(SpeechTree({
+app.use(speechTreeRouter({
   classifier: classifier.classify.bind(classifier)
 }));
 ```
@@ -170,22 +171,24 @@ app.use(SpeechTree({
 **example:**
 ```js
 import natural from 'natural';
-import SpeechTree from 'speech-tree/server/hapi';
+import speechTreePlugin from 'speech-tree/server/hapi';
 
 // ... hapi server initialization logic ....
 
 const classifier = new natural.BayesClassifier();
 
-classifier.addDocument('I would like you to show me a report', 'showReport');
-classifier.addDocument('Can you please show me a report', 'showReport');
-classifier.addDocument('I demand you to show me a report', 'showReport');
+classifier.addDocument("show list", 'showList');
+classifier.addDocument("sort list", 'sortList');
+classifier.addDocument("show picture of cats", 'showCatsPicture');
+classifier.addDocument("show picture of kittens", 'showCatsPicture');
 
 classifier.train();
 
 // Route 'speech-tree/label' will be registered unless specified else wise
-server.register(SpeechTree({
-  classifier: classifier.classify.bind(classifier)
-}));
+server.register({
+  register: speechTreeServer,
+  options: { classifier }
+});
 ```
 
 ## Download
