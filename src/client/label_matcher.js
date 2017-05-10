@@ -55,10 +55,19 @@ function createLabelMatcher(speechListener, options = {}) {
 
     fetch(request).then(response => response.json()).then(({ label }) => {
       labelEmitter.trigger(label, sentence);
+
+      // Re-register event listener after it (could have been) zeroed by the speech node.
+      // Here we wait run the registration in the next event loop to ensure all promises
+      // have been resolved
+      setTimeout(() => {
+        speechListener.once(test, handler);
+      });
     });
   };
 
-  speechListener.on(test, handler);
+  // Here we use the once() method and not the on() method we re-register the event
+  // listener once a fetch has been done
+  speechListener.once(test, handler);
 
   // A factory function which will generate an event handler for matching sentences
   // against fetched labels. Be sure to call the dispose() method once you don't need
@@ -76,7 +85,10 @@ function createLabelMatcher(speechListener, options = {}) {
     // An async event handler which returns a promise
     return () => new Promise((resolve) => {
       // The promise will resolve itself whenever an emitted label matches the
-      // expected label
+      // expected label.
+      // TODO: We can force memory leak by removing the label matcher event listener
+      // leaving the event listener above still registered. This should be fixed in the
+      // future
       labelEmitter.once((actualLabel, sentence) => {
         if (actualLabel == label) {
           // These are the arguments with whom the event handler will be invoked with
