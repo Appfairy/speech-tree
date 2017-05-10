@@ -1,5 +1,5 @@
 import { LABEL_DEFAULT_ENDPOINT } from '../consts';
-import SpeechListener from './speech_listener';
+import SpeechEmitter from './speech_emitter';
 
 // An instance of the SpeechNode class represents a single node in an entire tree where
 // we can register events to voice commands in sequence.
@@ -10,20 +10,20 @@ import SpeechListener from './speech_listener';
 //   - "Please sort the list"
 //
 class SpeechNode {
-  constructor(speechListener, parentNode) {
-    if (speechListener == null) {
-      throw TypeError('speech listener must be provided');
+  constructor(speechEmitter, parentNode) {
+    if (speechEmitter == null) {
+      throw TypeError('speech emitter must be provided');
     }
 
-    if (!(speechListener instanceof SpeechListener)) {
-      throw TypeError('first argument must be a speech listener');
+    if (!(speechEmitter instanceof SpeechEmitter)) {
+      throw TypeError('first argument must be a speech emitter');
     }
 
     if (parentNode && !(parentNode instanceof SpeechNode)) {
       throw TypeError('second argument must be a speech node');
     }
 
-    this.speechListener = speechListener;
+    this.speechEmitter = speechEmitter;
     this.parentNode = parentNode;
     // We can register multiple tests for a single handler. This array is used to
     // accumulate tests until their handler is being specified, in which case this array
@@ -72,10 +72,10 @@ class SpeechNode {
     const wrappedHandler = (...matches) => {
       // Re-register all tests of the current node and above, discarding all events
       // of child nodes
-      this.speechListener.off();
+      this.speechEmitter.off();
 
       this.getTestsRecursively().forEach(([text, handler]) => {
-        this.speechListener.on(text, handler);
+        this.speechEmitter.on(text, handler);
       });
 
       // If the handler returns a function it means that the user would like to keep
@@ -84,11 +84,11 @@ class SpeechNode {
 
       if (typeof speechNodeRequest != 'function') return;
 
-      speechNodeRequest(new SpeechNode(this.speechListener, this));
+      speechNodeRequest(new SpeechNode(this.speechEmitter, this));
     };
 
     this.testsBatch.forEach((test) => {
-      this.speechListener.on(test, wrappedHandler);
+      this.speechEmitter.on(test, wrappedHandler);
     });
 
     // Compose test-handler pairs

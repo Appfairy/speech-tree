@@ -1,6 +1,5 @@
 import { LABEL_DEFAULT_ENDPOINT } from '../consts';
 import SpeechEmitter from './speech_emitter';
-import SpeechListener from './speech_listener';
 
 // This module can generate tester functions which will validate incoming sentences
 // against a label which can be fetched from the server using the provided plug-ins.
@@ -27,13 +26,13 @@ Object.defineProperty(createLabelMatcher, 'labelURL', {
 // This will start listening for incoming sentences and will fetch labels from the server
 // each time a speech was recognized. It will return a factory function which will
 // generate an event handler for testing sentences against fetched labels
-function createLabelMatcher(speechListener, options = {}) {
-  if (speechListener == null) {
-    throw TypeError('speech listener must be provided');
+function createLabelMatcher(speechEmitter, options = {}) {
+  if (speechEmitter == null) {
+    throw TypeError('speech emitter must be provided');
   }
 
-  if (!(speechListener instanceof SpeechListener)) {
-    throw TypeError('first argument must be a speech listener');
+  if (!(speechEmitter instanceof SpeechListener)) {
+    throw TypeError('first argument must be a speech emitter');
   }
 
   if (!(options instanceof Object)) {
@@ -60,14 +59,14 @@ function createLabelMatcher(speechListener, options = {}) {
       // Here we wait run the registration in the next event loop to ensure all promises
       // have been resolved
       setTimeout(() => {
-        speechListener.once(sentencePattern, fetchHandler);
+        speechEmitter.once(sentencePattern, fetchHandler);
       });
     });
   };
 
   // Here we use the once() method and not the on() method we re-register the event
   // listener once a fetch has been done
-  speechListener.once(sentencePattern, fetchHandler);
+  speechEmitter.once(sentencePattern, fetchHandler);
 
   // A factory function which will generate an event handler for matching sentences
   // against fetched labels. Be sure to call the dispose() method once you don't need
@@ -103,7 +102,7 @@ function createLabelMatcher(speechListener, options = {}) {
   // The disposal methods disposes all the registered label events and it stops the
   // auto-fetching to the server whenever there is an incoming sentence
   matchLabel.dispose = () => {
-    speechListener.off(test, handler);
+    speechEmitter.off(test, handler);
     labelEmitter.off();
   };
 
