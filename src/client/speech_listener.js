@@ -1,7 +1,7 @@
 import SpeechRecognition from 'speech_recognition';
 import SpeechEmitter from './speech_emitter';
 
-// SpeechListener wraps the native speech recognition web API and will trigger an event
+// SpeechListener wraps the native speech recognition web API and will emit an event
 // whenever there is an incoming sentence
 class SpeechListener extends SpeechEmitter {
   get listening() {
@@ -29,7 +29,7 @@ class SpeechListener extends SpeechEmitter {
 
   _handleSpeechResult(e) {
     const sentence = e.results[e.results.length - 1][0].transcript.trim();
-    this.trigger(sentence);
+    this.emit(sentence);
   }
 }
 

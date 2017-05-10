@@ -46,7 +46,7 @@ function createLabelMatcher(speechListener, options = {}) {
   const labelEmitter = new SpeechEmitter();
   const sentencePattern = /.*/;
 
-  // This will fetch labels and trigger them whenever there is an incoming sentence
+  // This will fetch labels and emit them whenever there is an incoming sentence
   const fetchHandler = (sentence) => {
     // e.g. ' ' (space) will be replaced with '%20'
     const encodedSentence = encodeURIComponent(sentence);
@@ -54,7 +54,7 @@ function createLabelMatcher(speechListener, options = {}) {
     const request = new Request(labelQueryURL);
 
     fetch(request).then(response => response.json()).then(({ label }) => {
-      labelEmitter.trigger(label, sentence);
+      labelEmitter.emit(label, sentence);
 
       // Re-register event listener after it (could have been) zeroed by the speech node.
       // Here we wait run the registration in the next event loop to ensure all promises

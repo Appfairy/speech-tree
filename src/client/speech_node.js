@@ -73,7 +73,10 @@ class SpeechNode {
       // Re-register all tests of the current node and above, discarding all events
       // of child nodes
       this.speechListener.off();
-      this.speechListener.on(this.getTestsRecursively());
+
+      this.getTestsRecursively().forEach(([text, handler]) => {
+        this.speechListener.on(text, handler);
+      });
 
       // If the handler returns a function it means that the user would like to keep
       // building the speech tree
@@ -84,7 +87,9 @@ class SpeechNode {
       speechNodeRequest(new SpeechNode(this.speechListener, this));
     };
 
-    this.speechListener.on(this.testsBatch, wrappedHandler);
+    this.testsBatch.forEach((test) => {
+      this.speechListener.on(test, wrappedHandler);
+    });
 
     // Compose test-handler pairs
     const testsBatch = this.testsBatch.map((test) => {

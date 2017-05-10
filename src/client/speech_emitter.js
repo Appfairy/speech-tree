@@ -1,5 +1,5 @@
 // This is a special event emitter which invokes a handler whenever there was a match
-// with the triggered sentence. The match can be done based on a string,
+// with the emitted sentence. The match can be done based on a string,
 // regular expression or a custom handler. The handler can return a promise as well,
 // making the matching process asynchronous and not necessarily synchronous
 class SpeechEmitter {
@@ -10,25 +10,6 @@ class SpeechEmitter {
 
   // Register a permanent event until being disposed manually
   on(test, handler) {
-    if (test instanceof Array) {
-      if (handler != null) {
-        if (typeof handler != 'function') {
-          throw TypeError('handler must be a function');
-        }
-
-        test.forEach((test) => {
-          this.on(test, handler);
-        });
-      }
-      else {
-        test.forEach(([test, handler]) => {
-          this.on(test, handler);
-        });
-      }
-
-      return;
-    }
-
     if (test == null) {
       throw TypeError('test must be provided');
     }
@@ -59,25 +40,6 @@ class SpeechEmitter {
 
   // Register a one time event
   once(test, handler) {
-    if (test instanceof Array) {
-      if (handler != null) {
-        if (typeof handler != 'function') {
-          throw TypeError('handler must be a function');
-        }
-
-        test.forEach((test) => {
-          this.once(test, handler);
-        });
-      }
-      else {
-        test.forEach(([test, handler]) => {
-          this.once(test, handler);
-        });
-      }
-
-      return;
-    }
-
     if (test == null) {
       throw TypeError('test must be provided');
     }
@@ -133,8 +95,8 @@ class SpeechEmitter {
     }
   }
 
-  // Trigger an event. The rest of the arguments will be forwarded to the test handlers
-  trigger(sentence, ...args) {
+  // Emit an event. The rest of the arguments will be forwarded to the test handlers
+  emit(sentence, ...args) {
     if (sentence == null) {
       throw TypeError('sentence must be provided');
     }
