@@ -183,7 +183,7 @@ emitter.on(matchLabel('helloWorld'), (sentence) => {
 ```js
 import { settings } from 'speech-tree/client';
 
-settings.apiURL = '/speech-tree';
+settings.apiUrl = '/speech-tree';
 ```
 
 or
@@ -191,7 +191,7 @@ or
 ```js
 import { settings } from 'speech-tree/server/express';
 
-settings.apiURL = '/speech-tree';
+settings.apiUrl = '/speech-tree';
 ```
 
 or
@@ -199,7 +199,7 @@ or
 ```js
 import { settings } from 'speech-tree/server/hapi';
 
-settings.apiURL = '/speech-tree';
+settings.apiUrl = '/speech-tree';
 ```
 
 ### speechTreeApi
