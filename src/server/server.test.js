@@ -2,19 +2,19 @@ import detectPort from 'detect-port';
 import express from 'express';
 import hapi from 'hapi';
 import settings from '../settings';
-import { speechTreeAPI as expressSpeechTreeAPI } from './express';
-import { speechTreeAPI as hapiSpeechTreeAPI } from './hapi';
+import { speechTreeApi as expressSpeechTreeApi } from './express';
+import { speechTreeApi as hapiSpeechTreeApi } from './hapi';
 
-describe('Speech Tree server API', () => {
+describe('Speech Tree server Api', () => {
   describe('express middle-ware', () => {
     let server;
 
     beforeAll(() => {
       return detectPort().then((port) => {
         const app = express();
-        settings.apiURL = `http://localhost:${port}/speech-tree`;
+        settings.apiUrl = `http://localhost:${port}/speech-tree`;
 
-        app.use(expressSpeechTreeAPI({
+        app.use(expressSpeechTreeApi({
           speechClassifier: (sentence) => {
             switch (sentence) {
               case 'hello world': return 'helloWorld';
@@ -42,12 +42,12 @@ describe('Speech Tree server API', () => {
     beforeAll(() => {
       return detectPort().then((port) => {
         server = new hapi.Server();
-        settings.apiURL = `http://localhost:${port}/speech-tree`;
+        settings.apiUrl = `http://localhost:${port}/speech-tree`;
 
         server.connection({ port });
 
         return server.register({
-          register: hapiSpeechTreeAPI,
+          register: hapiSpeechTreeApi,
           options: {
             speechClassifier: (sentence) => {
               switch (sentence) {
@@ -76,7 +76,7 @@ describe('Speech Tree server API', () => {
     test('GET speech-tree/label', () => {
       return Promise.resolve().then(() => {
         const request = new Request(
-          `${settings.apiURL}/label?sentence=hello%20world`
+          `${settings.apiUrl}/label?sentence=hello%20world`
         );
 
         return fetch(request).then(response => response.json()).then(({ label }) => {
@@ -85,7 +85,7 @@ describe('Speech Tree server API', () => {
       })
       .then(() => {
         const request = new Request(
-          `${settings.apiURL}/label?sentence=foo%20bar`
+          `${settings.apiUrl}/label?sentence=foo%20bar`
         );
 
         return fetch(request).then(response => response.json()).then(({ label }) => {

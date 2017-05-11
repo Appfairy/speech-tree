@@ -8,7 +8,7 @@ import settings from '../settings';
 //
 //   - speechClassifier (Function): A sentence-to-label mapping function
 //
-function speechTreeAPI(options) {
+function speechTreeApi(options) {
   if (!options.speechClassifier) {
     throw TypeError('speech classifier must be specified');
   }
@@ -18,9 +18,9 @@ function speechTreeAPI(options) {
   }
 
   const router = express.Router();
-  const apiURL = '/' + settings.apiURL.split('/').pop();
+  const apiUrl = '/' + settings.apiUrl.split('/').pop();
 
-  router.get(`${apiURL}/label`, async (req, res) => {
+  router.get(`${apiUrl}/label`, async (req, res) => {
     const sentence = req.query.sentence;
 
     if (!sentence) {
@@ -52,4 +52,4 @@ function speechTreeAPI(options) {
   return router;
 }
 
-export { speechTreeAPI, settings };
+export { speechTreeApi, settings };

@@ -1,3 +1,3 @@
 export default {
-  apiURL: '/speech-tree'
+  apiUrl: '/speech-tree'
 };

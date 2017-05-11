@@ -35,8 +35,8 @@ function createLabelMatcher(speechEmitter) {
   const fetchHandler = (sentence) => {
     // e.g. ' ' (space) will be replaced with '%20'
     const encodedSentence = encodeURIComponent(sentence);
-    const labelQueryURL = `${settings.apiURL}/label?sentence=${encodedSentence}`;
-    const request = new Request(labelQueryURL);
+    const labelQueryUrl = `${settings.apiUrl}/label?sentence=${encodedSentence}`;
+    const request = new Request(labelQueryUrl);
 
     fetch(request).then(response => response.json()).then(({ label }) => {
       labelEmitter.emit(label, sentence);

@@ -3,7 +3,7 @@ import settings from '../settings';
 import createLabelMatcher from './label_matcher';
 import SpeechEmitter from './speech_emitter';
 
-settings.apiURL = 'http://localhost:3000/speech-tree';
+settings.apiUrl = 'http://localhost:3000/speech-tree';
 
 describe.only('createLabelMatcher() function', () => {
   let server;
@@ -13,7 +13,7 @@ describe.only('createLabelMatcher() function', () => {
   beforeEach(() => {
     emitter = new SpeechEmitter();
     matchLabel = createLabelMatcher(emitter);
-    server = nock(settings.apiURL);
+    server = nock(settings.apiUrl);
   });
 
   afterEach(() => {

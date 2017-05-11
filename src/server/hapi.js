@@ -2,7 +2,7 @@ import boom from 'boom';
 import pack from '../../package.json';
 import settings from '../settings';
 
-speechTreeAPI.attributes = {
+speechTreeApi.attributes = {
   name: pack.name,
   version: pack.version
 };
@@ -14,7 +14,7 @@ speechTreeAPI.attributes = {
 //
 //   - speechClassifier (Function): A sentence-to-label mapping function
 //
-async function speechTreeAPI(server, options, next) {
+async function speechTreeApi(server, options, next) {
   if (!options.speechClassifier) {
     return next(TypeError('speech classifier must be specified'));
   }
@@ -23,11 +23,11 @@ async function speechTreeAPI(server, options, next) {
     return next(TypeError('speech classifier must be a function'));
   }
 
-  const apiURL = '/' + settings.apiURL.split('/').pop();
+  const apiUrl = '/' + settings.apiUrl.split('/').pop();
 
   server.route({
     method: ['GET'],
-    path: `${apiURL}/label`,
+    path: `${apiUrl}/label`,
     async handler(request, reply) {
       const sentence = request.query.sentence;
 
@@ -59,4 +59,4 @@ async function speechTreeAPI(server, options, next) {
   next();
 }
 
-export { speechTreeAPI, settings };
+export { speechTreeApi, settings };
