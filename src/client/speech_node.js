@@ -31,12 +31,6 @@ class SpeechNode {
     // A test-handler pairs array which will be used to register itself after the speech
     // commands map has been zeroed
     this.tests = [];
-
-    // This is a nice chaining technique where we ensure that the user has no access to
-    // functions that do not belong to the upcoming link in the sequence
-    return {
-      on: this.on.bind(this)
-    };
   }
 
   on(test) {
@@ -53,10 +47,7 @@ class SpeechNode {
     // Accumulate test for the current session
     this.testsBatch.push(test);
 
-    return {
-      or: this.on.bind(this),
-      invoke: this.invoke.bind(this)
-    };
+    return this;
   }
 
   invoke(handler) {
@@ -98,6 +89,8 @@ class SpeechNode {
     // Pipe tests for current session
     this.tests.push(...testsBatch);
     this.testsBatch = [];
+
+    return this;
   }
 
   // Gets tests of the current node and all its parents

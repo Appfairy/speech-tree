@@ -15,7 +15,7 @@ describe('SpeechNode() class', () => {
 
     speech
       .on('hello')
-      .or('world')
+      .on('world')
     .invoke((sentence) => {
       switch (time++) {
         case 0: expect(sentence).toEqual('hello'); break;
@@ -25,7 +25,7 @@ describe('SpeechNode() class', () => {
 
     speech
       .on('foo')
-      .or('baz')
+      .on('baz')
     .invoke((sentence) => {
       switch (time++) {
         case 2: expect(sentence).toEqual('foo'); break;
