@@ -28,7 +28,7 @@ function middleware(options) {
 
   const router = express.Router();
 
-  router.get(url, async (req, res) => {
+  router.get(options.url, async (req, res) => {
     const sentence = req.query.sentence;
 
     if (!sentence) {
