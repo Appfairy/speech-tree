@@ -13,182 +13,245 @@ Speech Tree is not supposed to provide you with a full robust solution, but rath
 
 ## API
 
-Speech Tree has provides you with client abilities, and additional server abilities, which should hook up to its client API.
+### SpeechEmitter() class
 
-Accordingly, if you would like to import Speech Tree, it should be done like so:
+**description**: This is basically an event emitter, similar to Node.JS's, only it is designed specifically for speech. Usually emitted events should be whole sentences, and therefore you can also listen to these sentences by registering the right events. You can either test a match with an incoming sentence using a string, regular expression, or a custom function which receives the sentence as its first argument.
+
+**methods**:
+
+- `on(String|RegExp|Function, Function)` - Register a permanent event. If the provided test is a user-defined function, then the test will pass if it returned a defined value. In case an array was returned, this array will be used as an arguments vector.
+- `once(String|RegExp|Function, Function)` - Same as `on`, only registers a one-time event.
+- `off([String|RegExp|Function], [Function])` - Unregister an event. If no event handler function was provided, all the events which belong to the provided test will be canceled. If no arguments were provided, all events will be canceled.
+- `emit(String)` - Emit an event.
+
+**usage**:
 
 ```js
-// Import client helpers
-import * as SpeechTree from 'speech-tree/client';
-// Import express middleware
-import SpeechTree from 'speech-tree/server/express';
-// Import hapi plugin
-import SpeechTree from 'speech-tree/server/hapi';
+import { SpeechEmitter } from 'speech/client';
+
+const emitter = new SpeechEmitter();
+
+emitter.on('hello world', (sentence) => {
+  assert(sentence, 'hello world');
+});
+
+emitter.on(/^hello (.+)$/, (sentence, subject) => {
+  assert(sentence, 'hello world');
+  assert(subject, 'world');
+});
+
+emitter.on((sentence) => {
+  return sentence.match(/^hello (.+)$/);
+}, (sentence, subject) => {
+  assert(sentence, 'hello world');
+  assert(subject, 'world');
+});
+
+emitter.emit('hello world');
 ```
 
-**Jump to:**
-  - [Client](#client)
-    - [Speech Listener](#speech-listener)
-    - [Speech Node](#speech-node)
-    - [Label Matcher](#label-matcher)
-  - [Server](#server)
-    - [Express Middleware](#express-middleware)
-    - [Hapi Plugin](#hapi-plugin)
+### SpeechListener([Object]) class
 
-### Client
+**description**: A simple wrapper around the native web-speech API, which also inherits from `SpeechEmitter`, so whenever there is an incoming speech, this speech will be emitted automatically. The constructor receives an optional options object which contains the `continuous` option, which hooks up directly to the `SpeechRecognition` instance.
 
-#### Speech Listener
+**methods**:
 
-**type:** class
-**name:** SpeechListener
+- `listening` - A getter which determines whether we are currently listening to incoming speech or not.
+- `start()` - Starts recognizing speech.
+- `stop()` - Stops speech recognition.
 
-**description**:
-The `SpeechListener` class is a simple wrapper around the native web-speech API and it gives you the ability to register event listeners which will invoke their belonging handlers based on incoming speech content.
+**usage**:
 
-**example**:
 ```js
-import nlp from 'compromise';
-import { SpeechListener } from 'speech-tree/client';
+import { SpeechListner } from 'speech/client';
 
 const listener = new SpeechListener({ continuous: true });
 
-listener.on(/print (.+)/).invoke((sentence, message) => {
-  console.log(message);
+listener.on('hello world', (sentence) => {
+  assert(sentence, 'hello world');
+});
+
+listener.on(/^hello (.+)$/, (sentence, subject) => {
+  assert(sentence, 'hello world');
+  assert(subject, 'world');
 });
 
 listener.on((sentence) => {
-  const r = nlp(sentence);
-  return r.topics().data().includes('shit') && sentence;
-}, (sentence) => {
-  console.log('watch your mouth young man!');
-});
-
-listener.once('stop listening').invoke(() => {
-  listener.stop();
+  return sentence.match(/^hello (.+)$/);
+}, (sentence, subject) => {
+  assert(sentence, 'hello world');
+  assert(subject, 'world');
 });
 
 listener.start();
 ```
 
-#### Speech Node
+### SpeechNode(SpeechEmitter) class
 
-**type:** class
-**name:** SpeechNode
+**description**: A single speech node represents a single node in a tree of a sequence of events which should follow one another in a specific order. This is useful if we want events to be dynamically registered and unregistered based on current state and based on previous incoming speech data. For example, we can say "show me a list", and then "sort the list", but we can't say "show me a picture of cats" and then "sort the list", that will not make sense. This is exactly the type of conflicts the speech node was meant to solve. The speech node is also useful in case we wanna register multiple tests for a single event handler.
 
-**description:**
-An instance of the `SpeechNode` class represents a single node in an entire tree of registered event listeners which invoke handlers in a sequence of a specific order. As we go down the events tree, all the events of the current children and their parents above will be registered. Once we invoked an event of a parent, all the events of their descending children will be disposed, living the events of current parents and their ancestors registered.
+**usage**:
 
-**exmaple:**
+Multiple tests for a single event handler:
+
 ```js
-import { SpeechListener, SpeechNode } from 'speech-tree/client';
+import { SpeechNode, SpeechListener } from 'speech-tree/client';
 
-const listener = new SpeechListener({ continuous: true });
+const listener = new SpeechListener();
 const speech = new SpeechNode(listener);
 
 speech
-  .on('I would like you to show me a list')
-  .or('Can you please show me a list')
-  .or('I demand you to show me a list')
-  .invoke((sentence) => (speech) => {
-    speech
-      .on('I would like you to sort the list')
-      .or('Can you please sort the list')
-      .or('I demand you to sort the list')
-      .invoke((sentence) => {
-        // ... sort list logic ...
-      });
-
-    // ... show list logic ...
-  });
+  .on('hello')
+  .on('world')
+.invoke((sentence) => {
+  assert(sentence, /hello|world/)
+});
 
 speech
-  .on('I would like you to show me a cute picture of cats')
-  .or('Can you please show me a cute picture of cats')
-  .or('I demand you to show me a cute picture of cats')
-  .invoke((sentence) => {
-    // ... show a cute picture of cats logic ...
+  .on('foo')
+  .on('bar')
+.invoke((sentence) => {
+  assert(sentence, /foo|bar/)
+});
+
+listener.start();
+```
+
+Sequence of events:
+
+```js
+import { SpeechNode, SpeechListener } from 'speech-tree/client';
+
+const listener = new SpeechListener();
+const speech = new SpeechNode(listener);
+
+speech.on('show a list').invoke(() => (speech) => {
+  speech.on('sort the list').invoke(() => {
+    // ... sort list logic ...
   });
 
-listener.start();
-```
-
-#### Label Matcher
-
-**type:** function
-**name:** createLabelMatcher
-
-**description:**
-As soon as this function is being called, it registers an event which will start fetching labels from the server whenever there is an incoming sentence. This function returns another function, which should be used as an event tester when registering external events, to test if an incoming sentence is classified as a specified label or not.
-
-**example:**
-```js
-import { SpeechListener, SpeechNode, createLabelMatcher } from 'speech-tree/client';
-
-const listener = new SpeechListener({ continuous: true });
-const matchLabel = createLabelMatcher(listener);
-
-listener.on(matchLabel('showReport'), () => {
-  // ... show report logic ...
+  // ... show list logic ...
 });
 
-listener.once('stop matching labels', () => {
-  matchLabel.dispose();
+speech.on('show a picture of cats').invoke(() => (speech) => {
+  // ... show a picture of cats logic ...
 });
 
 listener.start();
 ```
 
-### Server
+### createLabelMatcher(SpeechEmitter) function
 
-Everything that is related to classifying sentence should be done on the server, sine such a process requires trained speech models which can classify sentences efficiently, something which requires lots of time to initialize; Therefore, training data should be stored on the server once a model has finished its training session. In addition, data can be collected from multiple users and can be stored on the server, to improve our speech model accordingly. The classification process doesn't necessarily have to be synchronous, in case it returns a promise. Currently, the route end-point for classifying sentence can be registered for [hapi](https://hapijs.com/) and [express](https://expressjs.com/) servers, besides that there aren't any future plans for more server platforms.
+**description**: This function receives an instance of a SpeechEmitter so it can listen to incoming speech emitted by the emitter. Whenever speech has been emitted, the label matcher will try to fetch the belonging label to the emitted speech, and if there was a match, we can invoke an event accordingly.
 
-#### Express Middleware
+**returns**: matchLabel(String) function
 
-**example:**
+**usage**:
+
 ```js
-import natural from 'natural';
-import speechTreeRouter from 'speech-tree/server/express';
+import { createLabelMatcher } from './speech-tree/client';
 
-// ... express server initialization logic ....
+const matchLabel = createLabelMatcher(emitter);
+```
 
-const classifier = new natural.BayesClassifier();
+### matchLabel(String) function
 
-classifier.addDocument("show list", 'showList');
-classifier.addDocument("sort list", 'sortList');
-classifier.addDocument("show picture of cats", 'showCatsPicture');
-classifier.addDocument("show picture of kittens", 'showCatsPicture');
+**description**: This function receives a string representing a speech label, and returns a testing function which will try to match incoming speech to the specified label. In case of a match, the event handler will be invoked.
 
-classifier.train();
+**returns**: eventHandler() function
 
-// Route 'speech-tree/label' will be registered unless specified else wise
-app.use(speechTreeRouter({
-  classifier: classifier.classify.bind(classifier)
+**usage**:
+
+```js
+const matchLabel = createLabelMatcher(emitter);
+
+emitter.on(matchLabel('helloWorld'), (sentence) => {
+  assert(sentence, 'I would like to say hello to the world');
+});
+```
+
+### settings object
+
+**description**: A shared settings object which ca affect the behavior of Speech Tree.
+
+**properties**:
+
+- `apiUrl` - A string representing the url string which will be used to connect to Speech Tree's API. Defaults to `/speech-tree`.
+
+**usage**:
+
+```js
+import { settings } from 'speech-tree/client';
+
+settings.apiURL = '/speech-tree';
+```
+
+or
+
+```js
+import { settings } from 'speech-tree/server/express';
+
+settings.apiURL = '/speech-tree';
+```
+
+or
+
+```js
+import { settings } from 'speech-tree/server/hapi';
+
+settings.apiURL = '/speech-tree';
+```
+
+### speechTreeApi
+
+**description**: An extension which hooks up into an existing server and provides you with Speech Tree's server API. This extension receives an options object which is essential for the extension to initialize properly. This extension can be either hooked up as an Express middle-ware or a Hapi plug-in.
+
+**options**:
+
+- `speechClassifier(String)` - A required classifier function which receives a sentence and returns its belonging label. Essential for the label matcher to work properly.
+
+**usage**:
+
+Express middle-ware:
+
+```js
+import { speechTreeApi } from 'speech-tree/server/express';
+
+const app = express();
+
+app.use(speechTreeApi({
+  speechClassifier: (sentence) => {
+    switch (sentence) {
+      case 'hello world': return 'helloWorld';
+      case 'foo bar': return 'fooBar';
+    }
+  }
 }));
+
+app.listen(3000);
 ```
 
-#### Hapi Plugin
+Hapi plug-in:
 
-**example:**
 ```js
-import natural from 'natural';
-import speechTreePlugin from 'speech-tree/server/hapi';
+import { speechTreeApi } from 'speech-tree/server/hapi';
 
-// ... hapi server initialization logic ....
+const server = new hapi.Server();
+server.connection({ port: 3000 });
 
-const classifier = new natural.BayesClassifier();
-
-classifier.addDocument("show list", 'showList');
-classifier.addDocument("sort list", 'sortList');
-classifier.addDocument("show picture of cats", 'showCatsPicture');
-classifier.addDocument("show picture of kittens", 'showCatsPicture');
-
-classifier.train();
-
-// Route 'speech-tree/label' will be registered unless specified else wise
 server.register({
-  register: speechTreeServer,
-  options: { classifier }
+  register: speechTreeApi,
+  options: {
+    speechClassifier: (sentence) => {
+      switch (sentence) {
+        case 'hello world': return 'helloWorld';
+        case 'foo bar': return 'fooBar';
+      }
+    }
+  }
 });
+
+server.start();
 ```
 
 ## Download
