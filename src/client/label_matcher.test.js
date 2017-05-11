@@ -1,17 +1,19 @@
 import nock from 'nock';
+import settings from '../settings';
 import createLabelMatcher from './label_matcher';
 import SpeechEmitter from './speech_emitter';
 
-describe('createLabelMatcher() function', () => {
+settings.apiURL = 'http://localhost:3000/speech-tree';
+
+describe.only('createLabelMatcher() function', () => {
   let server;
   let emitter;
   let matchLabel;
-  let url = 'http://localhost:3000';
 
   beforeEach(() => {
     emitter = new SpeechEmitter();
-    matchLabel = createLabelMatcher(emitter, { labelURL: `${url}/speech-tree/label` });
-    server = nock(url);
+    matchLabel = createLabelMatcher(emitter);
+    server = nock(settings.apiURL);
   });
 
   afterEach(() => {
@@ -21,12 +23,12 @@ describe('createLabelMatcher() function', () => {
 
   test('label matching', (next) => {
     server
-      .get('/speech-tree/label')
+      .get('/label')
       .query({ sentence: 'I am saying hello to the world' })
       .reply(200, { label: 'helloWorld' });
 
     server
-      .get('/speech-tree/label')
+      .get('/label')
       .query({ sentence: 'I would like to foo a bar' })
       .reply(200, { label: 'fooBar' });
 

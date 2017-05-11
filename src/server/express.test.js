@@ -1,20 +1,15 @@
 import detectPort from 'detect-port';
 import express from 'express';
-import speechTreeRouter from './express';
+import { speechTreeAPI, settings } from './express';
 
-describe('Speech Tree express router', () => {
-  let port;
-  let url;
-  let app;
-
+describe('Speech Tree express API', () => {
   beforeEach(() => {
-    return detectPort().then((...args) => {
-      port = args[0];
-      url = 'http://localhost:' + port;
-      app = express();
+    return detectPort().then((port) => {
+      const app = express();
+      settings.apiURL = `http://localhost:${port}/speech-tree`;
 
-      app.use(speechTreeRouter({
-        classifier: (sentence) => {
+      app.use(speechTreeAPI({
+        speechClassifier: (sentence) => {
           switch (sentence) {
             case 'hello world': return 'helloWorld';
             case 'foo bar': return 'fooBar';
@@ -31,7 +26,7 @@ describe('Speech Tree express router', () => {
   test('GET speech-tree/label', () => {
     return Promise.resolve().then(() => {
       const request = new Request(
-        `${url}/speech-tree/label?sentence=hello%20world`
+        `${settings.apiURL}/label?sentence=hello%20world`
       );
 
       return fetch(request).then(response => response.json()).then(({ label }) => {
@@ -40,7 +35,7 @@ describe('Speech Tree express router', () => {
     })
     .then(() => {
       const request = new Request(
-        `${url}/speech-tree/label?sentence=foo%20bar`
+        `${settings.apiURL}/label?sentence=foo%20bar`
       );
 
       return fetch(request).then(response => response.json()).then(({ label }) => {

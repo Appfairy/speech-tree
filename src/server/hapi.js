@@ -1,8 +1,8 @@
 import boom from 'boom';
 import pack from '../../package.json';
-import { LABEL_DEFAULT_ENDPOINT } from '../consts';
+import settings from '../settings';
 
-register.attributes = {
+speechTreeAPI.attributes = {
   name: pack.name,
   version: pack.version
 };
@@ -12,29 +12,22 @@ register.attributes = {
 //
 // Options:
 //
-//   - path (String): The path of the registered route
-//   - classifier (Function): A sentence-to-label mapping function
+//   - speechClassifier (Function): A sentence-to-label mapping function
 //
-async function register(server, options, next) {
-  options = Object.assign({
-    path: LABEL_DEFAULT_ENDPOINT
-  }, options);
-
-  if (typeof options.path != 'string') {
-    return next(TypeError('path must be a string'));
+async function speechTreeAPI(server, options, next) {
+  if (!options.speechClassifier) {
+    return next(TypeError('speech classifier must be specified'));
   }
 
-  if (!options.classifier) {
-    return next(TypeError('classifier must be specified'));
+  if (typeof options.speechClassifier != 'function') {
+    return next(TypeError('speech classifier must be a function'));
   }
 
-  if (typeof options.classifier != 'function') {
-    return next(TypeError('classifier must be a function'));
-  }
+  const apiURL = '/' + settings.apiURL.split('/').pop();
 
   server.route({
     method: ['GET'],
-    path: options.path,
+    path: `${apiURL}/label`,
     async handler(request, reply) {
       const sentence = request.query.sentence;
 
@@ -43,7 +36,7 @@ async function register(server, options, next) {
         return reply(error);
       }
 
-      let label = options.classifier(sentence);
+      let label = options.speechClassifier(sentence);
 
       if (!label) {
         const error = boom.notFound('label not found');
@@ -66,4 +59,4 @@ async function register(server, options, next) {
   next();
 }
 
-export default register;
+export { speechTreeAPI, settings };

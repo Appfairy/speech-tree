@@ -1,4 +1,3 @@
-import { LABEL_DEFAULT_ENDPOINT } from '../consts';
 import SpeechEmitter from './speech_emitter';
 
 // An instance of the SpeechNode class represents a single node in an entire tree where

@@ -1,4 +1,4 @@
-import { LABEL_DEFAULT_ENDPOINT } from '../consts';
+import settings from '../settings';
 import SpeechEmitter from './speech_emitter';
 
 // This module can generate tester functions which will validate incoming sentences
@@ -14,19 +14,11 @@ import SpeechEmitter from './speech_emitter';
 //     console.log(sentence);
 //   });
 //
-let labelURL = LABEL_DEFAULT_ENDPOINT;
-
-Object.defineProperty(createLabelMatcher, 'labelURL', {
-  configurable: true,
-  enumerable: true,
-  get: () => labelURL,
-  set: (value) => labelURL = value
-});
 
 // This will start listening for incoming sentences and will fetch labels from the server
 // each time a speech was recognized. It will return a factory function which will
 // generate an event handler for testing sentences against fetched labels
-function createLabelMatcher(speechEmitter, options = {}) {
+function createLabelMatcher(speechEmitter) {
   if (speechEmitter == null) {
     throw TypeError('speech emitter must be provided');
   }
@@ -34,12 +26,6 @@ function createLabelMatcher(speechEmitter, options = {}) {
   if (!(speechEmitter instanceof SpeechEmitter)) {
     throw TypeError('first argument must be a speech emitter');
   }
-
-  if (!(options instanceof Object)) {
-    throw TypeError('options must be an object');
-  }
-
-  options = Object.assign({ labelURL }, options);
 
   // This will be used to register events for fetched labels
   const labelEmitter = new SpeechEmitter();
@@ -49,7 +35,7 @@ function createLabelMatcher(speechEmitter, options = {}) {
   const fetchHandler = (sentence) => {
     // e.g. ' ' (space) will be replaced with '%20'
     const encodedSentence = encodeURIComponent(sentence);
-    const labelQueryURL = `${options.labelURL}?sentence=${encodedSentence}`;
+    const labelQueryURL = `${settings.apiURL}/label?sentence=${encodedSentence}`;
     const request = new Request(labelQueryURL);
 
     fetch(request).then(response => response.json()).then(({ label }) => {

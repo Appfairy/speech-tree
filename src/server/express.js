@@ -1,34 +1,26 @@
 import express from 'express';
-import { LABEL_DEFAULT_ENDPOINT } from '../consts';
+import settings from '../settings';
 
 // Returns an express middle-ware which will register a route endpoint for handling
 // labels classifications for incoming sentences
 //
 // Options:
 //
-//   - path (String): The path of the registered route
-//   - classifier (Function): A sentence-to-label mapping function
+//   - speechClassifier (Function): A sentence-to-label mapping function
 //
-function middleware(options) {
-  options = Object.assign({
-    url: LABEL_DEFAULT_ENDPOINT
-  }, options);
-
-  if (typeof options.url != 'string') {
-    return next(TypeError('url must be a string'));
+function speechTreeAPI(options) {
+  if (!options.speechClassifier) {
+    throw TypeError('speech classifier must be specified');
   }
 
-  if (!options.classifier) {
-    return next(TypeError('classifier must be specified'));
-  }
-
-  if (typeof options.classifier != 'function') {
-    return next(TypeError('classifier must be a function'));
+  if (typeof options.speechClassifier != 'function') {
+    throw TypeError('speech classifier must be a function');
   }
 
   const router = express.Router();
+  const apiURL = '/' + settings.apiURL.split('/').pop();
 
-  router.get(options.url, async (req, res) => {
+  router.get(`${apiURL}/label`, async (req, res) => {
     const sentence = req.query.sentence;
 
     if (!sentence) {
@@ -36,7 +28,7 @@ function middleware(options) {
       return res.send('sentence must be provided');
     }
 
-    let label = options.classifier(sentence);
+    let label = options.speechClassifier(sentence);
 
     if (!label) {
       res.status(404);
@@ -60,4 +52,4 @@ function middleware(options) {
   return router;
 }
 
-export default middleware;
+export { speechTreeAPI, settings };
