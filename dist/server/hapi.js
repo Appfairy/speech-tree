@@ -88,7 +88,7 @@ exports.default = {
 module.exports = {
 	"name": "speech-tree",
 	"description": "An events tree which lets you define a sequence of voice commands.",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"repository": {
 		"type": "git",
 		"url": "https://DAB0mB@github.com/DAB0mB/speech-tree.git"
